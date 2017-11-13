@@ -7,70 +7,59 @@
 # Opmerking: Het alpaca bestand is erg groot! Neem eerst een klein proefstukje van het bestand, met 5 tot 10 fasta's.
 # Ga je runnen met het echte bestand, geef je programma dan even de tijd.
 
-class NotDNA_Exception(Exception):
-    pass
-
 def main():
 
-    try:
-        bestand = input("geef de naam van het bestand")
-        bestand2 = open(bestand)
 
-    except FileNotFoundError:
-        print("bestand niet gevonden")
-        return
+    bestand = input("geef de naam van het bestand")
     
-        
-            
-    headers, seqs = lees_inhoud(bestand2)
+    if bestand == "GCF_000164845.2_Vicugna_pacos-2.0.2_rna.fna":
+        bestand2 = open(bestand)
+        headers, seqs = lees_inhoud(bestand2)
 
-    zoekwoord = input("Geef een zoekwoord op: ")
-    i = 0
-    DNA = is_dna(seqs)
-
-    try:
-        Knipt = knipt(seqs)
-
-        
+        zoekwoord = input("Geef een zoekwoord op: ")
+        i = 0
         for line in headers[:10]:
             if zoekwoord in line:
                 print(80*'-')
                 print(headers[i])
                 print(seqs[i])
                 print(80*'-')
-                if DNA[i] == True:
-                    print("Dit is DNA")
-                else:
-                    print("Dit is geen DNA")
+                print(DNA[i])   
                 print(80*'-')
-                
+            
                 if Knipt[i] == "":
                     print("geen match gevonden")
                 else:
                     print("Match gevonden met enzym",Knipt[i])
-                
+            
                 i +=1
             else:
                 i += 1
+    else:
+        print("bestand bestaat niet")
                                                                                     # Voer hier de bestandsnaam van het juiste bestand in, of hernoem je bestand
-    except:
-        print("foutje")
-    return bestand2
 
-
+    DNA = is_dna(seqs)
+    Knipt = knipt(seqs)
     """
     Hier onder vind je de aanroep van de lees_inhoud functie, die gebruikt maakt van de bestand variabele als argument.
     De resultaten van de functie, de lijst met headers en de lijst met sequenties, sla je op deze manier op in twee losse resultaten.
     """
-
         
-    
-def lees_inhoud(bestand2):
 
+
+    
+    # schrijf hier de rest van de code nodig om de aanroepen te doen
+    is_dna(seqs)
+    knipt(seqs)
+    
+    
+def lees_inhoud(bestand):
+    bestand = open("GCF_000164845.2_Vicugna_pacos-2.0.2_rna.fna")
     headers = []
     seqs = []
 
-    for line in bestand2:
+    for line in bestand:
         if line[0] == ">" or line[0] == "\t":
             headers.append(line.rstrip())
         else:
@@ -116,15 +105,12 @@ def is_dna(seqs):
         tot = line.count("")
         totaal.append(tot)
     i = 0
-    try: 
-        while i < 11 :
-            i += 1
-            if hoeveelheidA[i] + hoeveelheidT[i] + hoeveelheidC[i] + hoeveelheidG[i] == totaal[i] - 1:
-                DNA.append(True)
-            else:
-                DNA.append(False)
-    except IndexError:
-        print("dit is geen FASTA file")
+    while i < 11 :
+        i += 1
+        if hoeveelheidA[i] + hoeveelheidT[i] + hoeveelheidC[i] + hoeveelheidG[i] == totaal[i] - 1:
+            DNA.append("DNA")
+        else:
+            DNA.append("Geen DNA")
     return DNA
    
 
@@ -140,18 +126,10 @@ def knipt(seqs):
     list1=[]
     knipt = []
     i2= 0
-    
     while i2 < 9:
         for line in bestand.readlines():    
             enzym, seq = line.split()       
-            seq = seq.replace("^","")
-            dna_controle(seq)
-            #A = line.count("A")
-            #T = line.count("T")
-            #C = line.count("C")
-            #G = line.count("G")
-            #totaal = line.count("")
-            #if A + T + C + G == totaal:
+            seq = seq.replace("^","")   
             list1.append(seq)
             x= seqs[i2].find(seq)
             if x > 0:
@@ -167,35 +145,5 @@ def knipt(seqs):
                 #print(80*"-")
                 knipt.append("")
                 i2 +=1
-    
-    return knipt
-
-def dna_controle(enzym):
-
-    A_count = enzym.count("A")
-    C_count = enzym.count("C")
-    T_count = enzym.count("T")
-    G_count = enzym.count("G")
-
-    total = A_count+C_count+T_count+G_count
-
-    if(total != len(enzym)):
-         raise NotDNA_Exception
-    
-    
-
-class NotDNA_Exception(Exception):
-    pass
-
-"""
-try:
-    dna_controle(input("seq plz:"))
-    print("hallo")
-    
-except NotDNA_Exception:
-    print("oeps")
-"""
-
+    return knipt    
 main()
-
-
